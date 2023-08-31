@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 from tqdm import tqdm
 import pandas_datareader as web
 import pandas as pd
@@ -53,10 +50,6 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 
-
-# In[2]:
-
-
 warnings.filterwarnings('ignore')
 yf.pdr_override()
 
@@ -73,9 +66,12 @@ if date.today().day > 27: #No final do mês ele considera o mês como finalizado
 else:
     last_price_date = dt.datetime(2023, date.today().month, 1)
 
-symbols = ['PETR4.SA', 'AMER3.SA', 'ITUB4.SA','VALE3.SA','WEGE3.SA','ELET3.SA','B3SA3.SA',           'VIIA3.SA','COGN3.SA','OIBR3.SA','CIEL3.SA','SHOW3.SA','EMBR3.SA','CVCB3.SA',           'ALPA4.SA','ABEV3.SA', 'BPAN4.SA','BBSE3.SA','BBDC4.SA','BBAS3.SA',           'BRKM5.SA','BRFS3.SA','CCRO3.SA','CMIG4.SA','CPLE6.SA','CSAN3.SA','CPFE3.SA','CYRE3.SA',           'ECOR3.SA','ENEV3.SA','EGIE3.SA','EQTL3.SA','EZTC3.SA','FLRY3.SA',           'GGBR4.SA','GOLL4.SA','HYPE3.SA','JBSS3.SA','JHSF3.SA',           'KLBN11.SA',           'LREN3.SA','MGLU3.SA','MRFG3.SA','BEEF3.SA','MRVE3.SA','MULT3.SA','PRIO3.SA','QUAL3.SA',           'RADL3.SA',           #'RAIL3.SA',\
-           'SBSP3.SA','SANB11.SA','SLCE3.SA','TAEE11.SA','VIVT3.SA',\
-           'TIMS3.SA','TOTS3.SA','USIM5.SA','YDUQ3.SA']
+symbols = ['PETR4.SA', 'AMER3.SA', 'ITUB4.SA','VALE3.SA','WEGE3.SA','ELET3.SA','B3SA3.SA', 'VIIA3.SA','COGN3.SA','OIBR3.SA','CIEL3.SA','SHOW3.SA','EMBR3.SA','CVCB3.SA',\
+           'ALPA4.SA','ABEV3.SA', 'BPAN4.SA','BBSE3.SA','BBDC4.SA','BBAS3.SA', 'BRKM5.SA','BRFS3.SA','CCRO3.SA','CMIG4.SA','CPLE6.SA','CSAN3.SA','CPFE3.SA','CYRE3.SA', \
+           'ECOR3.SA','ENEV3.SA','EGIE3.SA','EQTL3.SA','EZTC3.SA','FLRY3.SA', 'GGBR4.SA','GOLL4.SA','HYPE3.SA','JBSS3.SA','JHSF3.SA', 'KLBN11.SA', 'LREN3.SA','MGLU3.SA',\
+           'MRFG3.SA','BEEF3.SA','MRVE3.SA','MULT3.SA','PRIO3.SA','QUAL3.SA', 'RADL3.SA', 
+           #'RAIL3.SA',\
+           'SBSP3.SA','SANB11.SA','SLCE3.SA','TAEE11.SA','VIVT3.SA','TIMS3.SA','TOTS3.SA','USIM5.SA','YDUQ3.SA']
 
 benchmarks = ['^BVSP']
 
@@ -91,10 +87,6 @@ test_size = 'monthly'
 
 data_source = 'yf'
 
-
-# In[3]:
-
-
 #%% Download
 data = pd.DataFrame()
 data_high = pd.DataFrame()
@@ -106,17 +98,17 @@ data_benchmark = pd.DataFrame()
 #Várias formas de puxar os dados 
 if data_source == 'excel':
     data =    pd.read_excel('data.xlsx').set_index('date').fillna(method='bfill').loc[first_price_date:]
-    data_high =     pd.read_excel('data_high.xlsx').set_index('date').fillna(method='bfill').loc[first_price_date:]
-    data_low =    pd.read_excel('data_low.xlsx').set_index('date').fillna(method='bfill').loc[first_price_date:]
-    data_volume =    pd.read_excel('data_volume.xlsx').set_index('date').fillna(method='bfill').loc[first_price_date:]
+    data_high = pd.read_excel('data_high.xlsx').set_index('date').fillna(method='bfill').loc[first_price_date:]
+    data_low = pd.read_excel('data_low.xlsx').set_index('date').fillna(method='bfill').loc[first_price_date:]
+    data_volume = pd.read_excel('data_volume.xlsx').set_index('date').fillna(method='bfill').loc[first_price_date:]
 else:
     for sym in tqdm(symbols):
         if data_source == 'yf':
             if sym[-3:]!='.SA':
                 if sym=='BM&FBOVESPA Real Estate IFIX':
-                    dados=investpy.get_index_historical_data(sym, country='brazil',                    from_date=first_price_date.strftime('%d/%m/%Y'),                    to_date=last_price_date.strftime('%d/%m/%Y')).rename(columns={'Close':'Adj Close'})
+                    dados=investpy.get_index_historical_data(sym, country='brazil', from_date=first_price_date.strftime('%d/%m/%Y'), to_date=last_price_date.strftime('%d/%m/%Y')).rename(columns={'Close':'Adj Close'})
                 elif sym=='Fundo de Invest Ishares SP 500':
-                    dados=investpy.get_etf_historical_data(sym, country='brazil',                    from_date=first_price_date.strftime('%d/%m/%Y'),                    to_date=last_price_date.strftime('%d/%m/%Y')).rename(columns={'Close':'Adj Close'})
+                    dados=investpy.get_etf_historical_data(sym, country='brazil', from_date=first_price_date.strftime('%d/%m/%Y'), to_date=last_price_date.strftime('%d/%m/%Y')).rename(columns={'Close':'Adj Close'})
             else:
                 dados=web.data.get_data_yahoo(sym,first_price_date,last_price_date)
             adj = dados['Adj Close']/dados['Close'] #Ajustar dados
@@ -170,14 +162,9 @@ data_benchmark = data_benchmark.dropna()
 returns_benchmark = np.log(data_benchmark / data_benchmark.shift(1)) 
 returns_benchmark = returns_benchmark.dropna()
 
-
-# In[4]:
-
-
 #%% Optimization 
 
 ### Markowitz with preselection ###
-#if preselection == 'yes':
     
 def portfolio_variance_ps(w): #matriz de covariância
     _w = np.asarray(w) #tirar o "_"
@@ -391,25 +378,13 @@ def analise_rrg(serie, n_days):
     
     return posicao, posicao_past, posicao_pred, intensidade
 
-
-# In[5]:
-
-
 data = data.fillna(method = 'bfill')
 data_high = data_high.fillna(method = 'bfill')
 data_low = data_low.fillna(method = 'bfill')
 data_volume = data_volume.fillna(method = 'bfill')
 
-
-# In[6]:
-
-
 print('Digite o período de teste:')
 size_test = int(input())
-
-
-# In[7]:
-
 
 #%% Run
 
@@ -438,7 +413,7 @@ prediction_consolidate = pd.DataFrame(columns = symbols)
 
 end_data = returns.index[-1]
 dat_aux = end_data - increment_train
-initial_data = returns[(returns.index.year == dat_aux.year) &                       (returns.index.month == dat_aux.month)].index[0] 
+initial_data = returns[(returns.index.year == dat_aux.year) & (returns.index.month == dat_aux.month)].index[0] 
     
 for sym in symbols:
     
@@ -451,9 +426,9 @@ for sym in symbols:
     #Creating the features dataframe
     df = pd.DataFrame()
     df['RSI'] = momentum.RSIIndicator(close=all_data[sym]).rsi()
-    df['ATR'] = volatility.AverageTrueRange(high=all_data_high[sym], low=all_data_low[sym],                                                close=all_data[sym]).average_true_range()
+    df['ATR'] = volatility.AverageTrueRange(high=all_data_high[sym], low=all_data_low[sym], close=all_data[sym]).average_true_range()
     df['OBV'] = volume.on_balance_volume(close=all_data[sym], volume=all_data_volume[sym])
-    df['PSAR'] = trend.PSARIndicator(high=all_data_high[sym], low=all_data_low[sym],                                         close=all_data[sym]).psar()
+    df['PSAR'] = trend.PSARIndicator(high=all_data_high[sym], low=all_data_low[sym], close=all_data[sym]).psar()
             
     df['EWMA 5 P'] = pd.Series.ewm(all_data[sym], span=5).mean()
     df['EWMA 10 P'] = pd.Series.ewm(all_data[sym], span=10).mean()
@@ -489,23 +464,23 @@ for sym in symbols:
     df['StdDev 22 Ret'] = all_data[sym].pct_change(1).rolling(22).std()
     df['StdDev 66 Ret'] = all_data[sym].pct_change(1).rolling(66).std()
             
-    df['Bollinger_High_2'] =     volatility.BollingerBands(close = all_data[sym], window = 20, window_dev = 2)    .bollinger_hband() 
+    df['Bollinger_High_2'] = volatility.BollingerBands(close = all_data[sym], window = 20, window_dev = 2).bollinger_hband() 
     
-    df['Bollinger_Low_2'] =     volatility.BollingerBands(close = all_data[sym], window = 20, window_dev = 2)    .bollinger_lband() 
+    df['Bollinger_Low_2'] = volatility.BollingerBands(close = all_data[sym], window = 20, window_dev = 2).bollinger_lband() 
     
-    df['Bollinger_High_1'] =     volatility.BollingerBands(close = all_data[sym], window = 20, window_dev = 1)    .bollinger_hband() 
+    df['Bollinger_High_1'] = volatility.BollingerBands(close = all_data[sym], window = 20, window_dev = 1).bollinger_hband() 
 
-    df['Bollinger_Low_1'] =     volatility.BollingerBands(close = all_data[sym], window = 20, window_dev = 1)    .bollinger_lband()
+    df['Bollinger_Low_1'] = volatility.BollingerBands(close = all_data[sym], window = 20, window_dev = 1).bollinger_lband()
             
-    df['MACD'] =     trend.MACD(close = all_data[sym], window_slow = 26, window_fast = 12, window_sign = 9)    .macd() 
+    df['MACD'] = trend.MACD(close = all_data[sym], window_slow = 26, window_fast = 12, window_sign = 9).macd() 
             
-    df['MACD_Signal'] =     trend.MACD(close = all_data[sym], window_slow = 26, window_fast = 12, window_sign = 9)    .macd_signal() 
+    df['MACD_Signal'] = trend.MACD(close = all_data[sym], window_slow = 26, window_fast = 12, window_sign = 9).macd_signal() 
             
-    df['MACD_Hist'] =     trend.MACD(close = all_data[sym], window_slow = 26, window_fast = 12, window_sign = 9)    .macd_diff() 
+    df['MACD_Hist'] = trend.MACD(close = all_data[sym], window_slow = 26, window_fast = 12, window_sign = 9).macd_diff() 
             
-    df['Ultimate Oscillator']=    momentum.UltimateOscillator(high = all_data_high[sym], low = all_data_low[sym],                                    close = all_data[sym]).ultimate_oscillator() 
+    df['Ultimate Oscillator'] = momentum.UltimateOscillator(high = all_data_high[sym], low = all_data_low[sym], close = all_data[sym]).ultimate_oscillator() 
             
-    df['Williams']=    momentum.WilliamsRIndicator(high = all_data_high[sym], low = all_data_low[sym],    close = all_data[sym]).williams_r().replace(np.inf, 100).replace(-np.inf, -100)
+    df['Williams'] = momentum.WilliamsRIndicator(high = all_data_high[sym], low = all_data_low[sym], close = all_data[sym]).williams_r().replace(np.inf, 100).replace(-np.inf, -100)
             
     #Adding RRG
     df['RRG 5 X'] = analise_rrg(all_data[sym], 5)[0][0]
@@ -549,13 +524,13 @@ for sym in symbols:
     #Criar Dataframe normalizado
     df_normalizado = scaler.transform(df.dropna())
     
-    df_normalizado =     pd.DataFrame(df_normalizado, index = df.dropna().index, columns = df.columns)
+    df_normalizado = pd.DataFrame(df_normalizado, index = df.dropna().index, columns = df.columns)
             
     #Cria Dataframe com valores binários
     #se após um período size_test dias subiu, 1, se não, -1
-    df_trend_deterministic =     pd.DataFrame(index = df_normalizado.index, columns = df_normalizado.columns)
+    df_trend_deterministic = pd.DataFrame(index = df_normalizado.index, columns = df_normalizado.columns)
     for col in df_trend_deterministic.columns:
-        df_trend_deterministic.loc[:,col] =         np.where(df_normalizado[col].pct_change(size_test)>0, 1,-1)
+        df_trend_deterministic.loc[:,col] = np.where(df_normalizado[col].pct_change(size_test)>0, 1,-1)
             
     #Cria X_train, X_test, y_train, y_test
     X = df_trend_deterministic
@@ -626,16 +601,5 @@ print('Portfolio:')
 print(portfolio)
 print('')
 
-
-# In[8]:
-
-
-#Portfolio Trevas
-total_df.nsmallest(10,'Rent')
-
-
-# In[ ]:
-
-
-
-
+print('Portfolio Trevas:')
+print(total_df.nsmallest(10,'Rent').index)
